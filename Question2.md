@@ -1,6 +1,4 @@
 
-Experience/technology tracks
-
 Preparation coverage
 
 - Core Java and advanced Java
@@ -787,14 +785,3 @@ For coding problems:
 - Alternative approach
 - Possible interviewer follow-up
 
-Recommended starting point
-
-# Day 1 – Core Java Interview Training
-
-We will start with the first 40 Core Java questions and learn them in depth, including answers you can confidently explain in an MNC interview.
-
-Your first topic: What happens internally when you execute a Java program?
-
-Start Day 1 – Core Java
-
-One important thing: Don't memorise answers word for word. Understand the concept so that even when the interviewer asks the same question differently, you can answer independently.
