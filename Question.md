@@ -330,24 +330,3 @@ If your interview is approaching, don't try to study everything equally.
 3. **Practical knowledge:** Can you implement Java concepts in real applications?
 4. **Database knowledge:** Can you write SQL queries?
 5. **Communication:** Can you explain your thought process clearly?
-
----
-
-## Let me prepare you for the actual interview.
-
-I need just two details:
-
-**1. What is the experience level mentioned in the job description?**
-- Fresher
-- 0–1 year
-- 1–2 years
-- 2+ years
-
-**2. What technologies are mentioned in the job description?**
-- Core Java
-- Java + SQL
-- Java + Spring Boot + Hibernate
-- Java Full Stack
-- Java + Microservices
-
-Based on that, I can prepare a **100 most expected MNC Java Developer interview questions with answers, practical coding questions, SQL queries, and scenario-based questions**, starting from basic concepts and progressing to advanced interview questions.
