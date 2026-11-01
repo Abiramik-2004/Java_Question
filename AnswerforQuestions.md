@@ -1844,3 +1844,24 @@ No
 Submit answers
 
 My suggestion: Give extra attention to synchronization, deadlock, volatile, `wait()` vs `sleep()`, checked vs unchecked exceptions, and custom exceptions. These concepts are frequently used in practical Java and Spring Boot interview scenarios.
+
+What is Spring Framework?
+What is Spring Boot?
+Difference between Spring and Spring Boot?
+What is Dependency Injection?
+What is Inversion of Control?
+What is the @Autowired annotation?
+Difference between @Component, @Service, and @Repository?
+What is @RestController?
+Difference between @Controller and @RestController?
+What is @RequestMapping?
+Difference between @GetMapping, @PostMapping, @PutMapping, and @DeleteMapping?
+What is Spring Data JPA?
+Difference between Hibernate and JPA?
+What is @Entity?
+What is @Id?
+What is @GeneratedValue?
+What is @Transactional?
+What is application.properties?
+What is REST API?
+What are HTTP status codes?
