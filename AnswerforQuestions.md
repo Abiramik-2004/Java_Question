@@ -1845,23 +1845,730 @@ Submit answers
 
 My suggestion: Give extra attention to synchronization, deadlock, volatile, `wait()` vs `sleep()`, checked vs unchecked exceptions, and custom exceptions. These concepts are frequently used in practical Java and Spring Boot interview scenarios.
 
-What is Spring Framework?
-What is Spring Boot?
-Difference between Spring and Spring Boot?
-What is Dependency Injection?
-What is Inversion of Control?
-What is the @Autowired annotation?
-Difference between @Component, @Service, and @Repository?
-What is @RestController?
-Difference between @Controller and @RestController?
-What is @RequestMapping?
-Difference between @GetMapping, @PostMapping, @PutMapping, and @DeleteMapping?
-What is Spring Data JPA?
-Difference between Hibernate and JPA?
-What is @Entity?
-What is @Id?
-What is @GeneratedValue?
-What is @Transactional?
-What is application.properties?
-What is REST API?
-What are HTTP status codes?
+# Spring Framework & Spring Boot – 20 Important Interview Questions
+
+These are very important for Java Developer, Java Full Stack Developer, and Spring Boot interviews.
+
+I'll explain each question using:
+
+- Simple English definitions.
+- Practical examples.
+- Important annotations.
+- Short answers you can speak in an interview.
+
+# Part 1: Spring Framework Fundamentals
+
+## 1. What is Spring Framework?
+
+Spring is a Java framework used to develop enterprise applications.
+
+It makes Java application development easier by providing features such as:
+
+- Dependency Injection (DI).
+- Inversion of Control (IoC).
+- Transaction Management.
+- Spring MVC.
+- Database Integration.
+- Security Integration.
+
+Example: Suppose we are developing an employee management application. Spring helps us manage employee services, repositories, database connections, and business logic.
+
+Interview answer:
+
+Spring Framework is an open-source Java framework used to develop enterprise applications. It provides features like Dependency Injection, Inversion of Control, transaction management, and web development support.
+
+## 2. What is Spring Boot?
+
+Spring Boot is built on top of the Spring Framework. It simplifies Spring application development by providing auto-configuration and starter dependencies.
+
+Main features:
+
+1. Auto-Configuration – Automatically configures components based on dependencies and application settings.
+2. Starter Dependencies – Provides ready-made dependency groups.
+3. Embedded Server – Supports servers like Tomcat.
+4. Production-Ready Features – Provides monitoring and management through Actuator.
+
+Example:
+
+Without Spring Boot, we may need to configure many things manually.
+
+With Spring Boot, we can create an application with minimal configuration.
+
+```
+@SpringBootApplication
+public class MyApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MyApplication.class, args);
+    }
+}
+```
+
+Interview answer:
+
+Spring Boot is a framework built on top of Spring that simplifies application development through auto-configuration, starter dependencies, and embedded servers.
+
+## 3. Difference between Spring and Spring Boot?
+
+| Spring Framework                                         | Spring Boot                               |
+| -------------------------------------------------------- | ----------------------------------------- |
+| Provides core application framework features             | Simplifies Spring application development |
+| Requires more manual configuration in traditional setups | Provides auto-configuration               |
+| Server configuration is often separate                   | Supports embedded servers                 |
+| Dependency management requires more setup                | Provides starter dependencies             |
+| More initial configuration                               | Minimal initial configuration             |
+
+Remember:
+
+- Spring → Core framework.
+- Spring Boot → Makes Spring development easier and faster.
+
+## 4. What is Dependency Injection (DI)?
+
+Dependency Injection is a design technique in which an object receives its required dependencies from an external source instead of creating them itself.
+
+Example without DI:
+
+```
+class Service {
+    Repository repo = new Repository();
+}
+```
+
+Here, Service creates its own Repository object.
+
+Example with DI:
+
+```
+@Component
+class Repository {
+}
+
+@Service
+class Service {
+
+    private final Repository repo;
+
+    public Service(Repository repo) {
+        this.repo = repo;
+    }
+}
+```
+
+Here, Spring provides the Repository object to the Service.
+
+Advantages:
+
+- Reduces tight coupling.
+- Improves code reusability.
+- Makes unit testing easier.
+- Improves maintainability.
+
+Remember: DI = Spring provides the required object instead of the class creating it manually.
+
+## 5. What is Inversion of Control (IoC)?
+
+Inversion of Control is a design principle in which control of object creation and management is transferred from the programmer to the Spring container.
+
+Normally, we create objects using `new`.
+
+With Spring, the Spring IoC container creates, manages, and provides objects called beans.
+
+Example:
+
+```
+@Component
+class Student {
+}
+```
+
+Spring creates and manages the Student object as a bean.
+
+Remember:
+
+- IoC → Principle.
+- DI → Technique used to implement IoC.
+
+Interview answer: IoC means Spring takes control of creating and managing objects instead of the programmer managing everything manually.
+
+## 6. What is the @Autowired annotation?
+
+`@Autowired` is used to inject dependencies automatically by Spring.
+
+Example:
+
+```
+@Component
+class Engine {
+}
+
+@Component
+class Car {
+
+    @Autowired
+    Engine engine;
+}
+```
+
+Spring automatically injects the Engine bean into Car.
+
+Constructor injection example:
+
+```
+@Component
+class Car {
+
+    private final Engine engine;
+
+    @Autowired
+    Car(Engine engine) {
+        this.engine = engine;
+    }
+}
+```
+
+In modern Spring, a single constructor does not require `@Autowired`.
+
+Types of dependency injection:
+
+1. Constructor Injection.
+2. Setter Injection.
+3. Field Injection.
+
+Interview tip: Constructor injection is generally preferred because it supports immutability and easier testing.
+
+## 7. Difference between @Component, @Service, and @Repository?
+
+All three annotations are used to register classes as Spring-managed beans.
+
+| Annotation    | Purpose                     |
+| ------------- | --------------------------- |
+| `@Component`  | General-purpose Spring bean |
+| `@Service`    | Business logic layer        |
+| `@Repository` | Database access layer       |
+
+Example:
+
+```
+@Component
+class EmailUtil {
+}
+```
+
+```
+@Service
+class EmployeeService {
+}
+```
+
+```
+@Repository
+class EmployeeRepository {
+}
+```
+
+Important: `@Repository` also supports translation of certain persistence exceptions into Spring's DataAccessException hierarchy.
+
+Remember:
+
+- Component → General class.
+- Service → Business logic.
+- Repository → Database operations.
+
+## 8. What is @RestController?
+
+`@RestController` is an annotation used to create REST APIs in Spring Boot.
+
+It combines:
+
+- `@Controller`
+- `@ResponseBody`
+
+It returns data directly, usually as JSON, instead of returning a view name.
+
+Example:
+
+```
+@RestController
+public class EmployeeController {
+
+    @GetMapping("/employees")
+    public String getEmployee() {
+        return "Abirami";
+    }
+}
+```
+
+Response:
+
+```
+Abirami
+```
+
+For an object response, Spring Boot typically converts it into JSON.
+
+## 9. Difference between @Controller and @RestController?
+
+| @Controller                                       | @RestController                        |
+| ------------------------------------------------- | -------------------------------------- |
+| Used mainly for MVC web applications              | Used for REST APIs                     |
+| Usually returns view names                        | Returns response data directly         |
+| Requires `@ResponseBody` for direct response data | Includes `@ResponseBody` automatically |
+| Can return HTML views                             | Commonly returns JSON/XML              |
+
+Remember:
+
+- Controller → View-based response by default.
+- RestController → Data-based response by default.
+
+## 10. What is @RequestMapping?
+
+`@RequestMapping` is used to map HTTP requests to controller classes or methods.
+
+It can define:
+
+- URL path.
+- HTTP method.
+- Request parameters.
+- Headers.
+- Content types.
+
+Example:
+
+```
+@RestController
+@RequestMapping("/employees")
+public class EmployeeController {
+
+    @RequestMapping(value = "/all",
+                    method = RequestMethod.GET)
+    public String getEmployees() {
+        return "Employee List";
+    }
+}
+```
+
+URL:
+
+```
+GET /employees/all
+```
+
+Remember: `@RequestMapping` maps HTTP requests to controller methods.
+
+## 11. Difference between @GetMapping, @PostMapping, @PutMapping, and @DeleteMapping?
+
+These annotations are used to map HTTP methods to controller methods.
+
+| Annotation       | HTTP Method | Purpose                      |
+| ---------------- | ----------- | ---------------------------- |
+| `@GetMapping`    | GET         | Retrieve data                |
+| `@PostMapping`   | POST        | Create new data              |
+| `@PutMapping`    | PUT         | Update or replace a resource |
+| `@DeleteMapping` | DELETE      | Delete data                  |
+
+Example:
+
+```
+@RestController
+@RequestMapping("/employees")
+public class EmployeeController {
+
+    @GetMapping
+    public String getEmployee() {
+        return "Get Employee";
+    }
+
+    @PostMapping
+    public String addEmployee() {
+        return "Employee Added";
+    }
+
+    @PutMapping("/{id}")
+    public String updateEmployee(@PathVariable int id) {
+        return "Employee Updated";
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteEmployee(@PathVariable int id) {
+        return "Employee Deleted";
+    }
+}
+```
+
+Real-world example:
+
+Suppose we have an Employee Management System:
+
+- GET → View employee details.
+- POST → Add a new employee.
+- PUT → Update employee details.
+- DELETE → Remove an employee.
+
+Remember: GET = Read, POST = Create, PUT = Update, DELETE = Remove.
+
+## 12. What is Spring Data JPA?
+
+Spring Data JPA is a part of the Spring Data project that simplifies database operations using JPA.
+
+It reduces the amount of boilerplate code required to interact with databases.
+
+Instead of writing SQL queries for every operation, we can use repository interfaces.
+
+Example:
+
+```
+@Entity
+class Employee {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+}
+```
+
+Repository:
+
+```
+@Repository
+public interface EmployeeRepository
+        extends JpaRepository<Employee, Long> {
+}
+```
+
+Now we can use built-in methods:
+
+```
+employeeRepository.save(employee);
+
+employeeRepository.findById(1L);
+
+employeeRepository.findAll();
+
+employeeRepository.deleteById(1L);
+```
+
+Advantages:
+
+- Reduces boilerplate code.
+- Provides ready-made CRUD operations.
+- Supports pagination and sorting.
+- Supports custom query methods.
+
+Remember: Spring Data JPA simplifies database operations using repository interfaces.
+
+## 13. Difference between Hibernate and JPA?
+
+| JPA                                        | Hibernate                      |
+| ------------------------------------------ | ------------------------------ |
+| Specification                              | ORM framework                  |
+| Defines standards for ORM                  | Provides implementation of JPA |
+| Cannot work as an implementation by itself | Can work as a JPA provider     |
+| Defines annotations and interfaces         | Implements JPA features        |
+
+Example:
+
+JPA annotations:
+
+```
+@Entity
+@Table(name = "employee")
+class Employee {
+
+    @Id
+    private Long id;
+}
+```
+
+Hibernate is commonly used behind the scenes to implement these JPA operations.
+
+Remember:
+
+- JPA → What should be implemented (specification).
+- Hibernate → How it is implemented (implementation).
+
+## 14. What is @Entity?
+
+`@Entity` is a JPA annotation used to mark a Java class as an entity that can be mapped to a database table.
+
+Example:
+
+```
+@Entity
+@Table(name = "employees")
+public class Employee {
+
+    @Id
+    private Long id;
+
+    private String name;
+
+    private double salary;
+}
+```
+
+Here:
+
+- Employee is an entity.
+- It is mapped to the employees table.
+- Its fields are mapped to database columns by default.
+
+Remember: `@Entity` tells JPA that a Java class represents a database entity.
+
+## 15. What is @Id?
+
+`@Id` is a JPA annotation used to identify the primary key of an entity.
+
+A primary key uniquely identifies each record in a database table.
+
+Example:
+
+```
+@Entity
+class Employee {
+
+    @Id
+    private Long id;
+
+    private String name;
+}
+```
+
+Here, `id` is the primary key.
+
+Remember: `@Id` identifies the primary key.
+
+## 16. What is @GeneratedValue?
+
+`@GeneratedValue` is a JPA annotation used to automatically generate primary key values.
+
+It is generally used along with `@Id`.
+
+Example:
+
+```
+@Entity
+class Employee {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+}
+```
+
+Important generation strategies:
+
+| Strategy | Purpose                                                  |
+| -------- | -------------------------------------------------------- |
+| IDENTITY | Database generates the ID, commonly using auto-increment |
+| SEQUENCE | Uses a database sequence                                 |
+| TABLE    | Uses a database table to generate IDs                    |
+| AUTO     | Provider chooses a suitable strategy                     |
+
+Remember: `@GeneratedValue` automatically generates primary key values.
+
+## 17. What is @Transactional?
+
+`@Transactional` is a Spring annotation used to manage database transactions.
+
+It ensures that a group of database operations is treated as one logical unit of work.
+
+Example:
+
+```
+@Service
+public class EmployeeService {
+
+    @Autowired
+    EmployeeRepository repository;
+
+    @Transactional
+    public void saveEmployee() {
+
+        Employee e1 = new Employee();
+        e1.setName("Abirami");
+
+        repository.save(e1);
+
+        // If an unchecked exception occurs here,
+        // the transaction normally rolls back.
+    }
+}
+```
+
+Important concepts:
+
+- Commit → Permanently saves transaction changes.
+- Rollback → Reverses transaction changes.
+- By default, Spring rolls back for unchecked exceptions (`RuntimeException` and `Error`).
+- Checked exceptions do not trigger rollback by default.
+
+We can configure rollback for checked exceptions:
+
+```
+@Transactional(rollbackFor = Exception.class)
+```
+
+Remember: `@Transactional` manages transaction boundaries and helps maintain database consistency.
+
+## 18. What is application.properties?
+
+`application.properties` is a configuration file used in Spring Boot applications.
+
+It stores application settings such as:
+
+- Database configuration.
+- Server port.
+- Database username and password.
+- Hibernate configuration.
+- Logging configuration.
+
+Example:
+
+```
+server.port=8081
+
+spring.datasource.url=jdbc:mysql://localhost:3306/company
+
+spring.datasource.username=root
+
+spring.datasource.password=root
+
+spring.jpa.hibernate.ddl-auto=update
+
+spring.jpa.show-sql=true
+```
+
+Explanation:
+
+| Property                        | Purpose                    |
+| ------------------------------- | -------------------------- |
+| `server.port`                   | Changes application port   |
+| `spring.datasource.url`         | Database connection URL    |
+| `spring.datasource.username`    | Database username          |
+| `spring.datasource.password`    | Database password          |
+| `spring.jpa.hibernate.ddl-auto` | Controls schema generation |
+| `spring.jpa.show-sql`           | Displays SQL queries       |
+
+Remember: `application.properties` stores Spring Boot application configuration.
+
+## 19. What is REST API?
+
+REST stands for Representational State Transfer.
+
+A REST API allows two applications to communicate over HTTP using resources and standard HTTP methods.
+
+For example, a frontend application communicates with a Spring Boot backend to retrieve employee information.
+
+Example:
+
+Suppose we have an Employee Management System.
+
+| HTTP Method | Endpoint       | Operation          |
+| ----------- | -------------- | ------------------ |
+| GET         | `/employees`   | Get all employees  |
+| GET         | `/employees/1` | Get employee by ID |
+| POST        | `/employees`   | Create employee    |
+| PUT         | `/employees/1` | Update employee    |
+| DELETE      | `/employees/1` | Delete employee    |
+
+Example JSON response:
+
+```
+{
+    "id": 1,
+    "name": "Abirami",
+    "salary": 30000
+}
+```
+
+Important REST principles:
+
+1. Client-server architecture.
+2. Stateless communication.
+3. Resource-based URLs.
+4. Standard HTTP methods.
+5. Representations such as JSON.
+
+Remember: REST API allows applications to communicate using HTTP methods and resource-based endpoints.
+
+## 20. What are HTTP Status Codes?
+
+HTTP status codes are three-digit numbers returned by the server to indicate the result of an HTTP request.
+
+They are divided into five categories.
+
+| Category | Meaning       |
+| -------- | ------------- |
+| 1xx      | Informational |
+| 2xx      | Success       |
+| 3xx      | Redirection   |
+| 4xx      | Client Error  |
+| 5xx      | Server Error  |
+
+Important status codes for interviews:
+
+| Status Code | Meaning               | Example                                    |
+| ----------- | --------------------- | ------------------------------------------ |
+| 200         | OK                    | Successfully retrieved data                |
+| 201         | Created               | Employee created                           |
+| 204         | No Content            | Successfully deleted with no response body |
+| 400         | Bad Request           | Invalid request data                       |
+| 401         | Unauthorized          | Authentication required or failed          |
+| 403         | Forbidden             | User doesn't have permission               |
+| 404         | Not Found             | Employee doesn't exist                     |
+| 405         | Method Not Allowed    | Unsupported HTTP method                    |
+| 409         | Conflict              | Duplicate or conflicting resource          |
+| 500         | Internal Server Error | Unexpected server error                    |
+| 503         | Service Unavailable   | Server temporarily unavailable             |
+
+Remember:
+
+- 2xx → Success.
+- 3xx → Redirection.
+- 4xx → Client mistake.
+- 5xx → Server problem.
+
+# Quick Revision – All 20 Spring Boot Questions
+
+| No. | Question                           | Important point                   |
+| --- | ---------------------------------- | --------------------------------- |
+| 1   | Spring Framework                   | Java enterprise framework         |
+| 2   | Spring Boot                        | Simplifies Spring development     |
+| 3   | Spring vs Spring Boot              | Framework vs simplified setup     |
+| 4   | Dependency Injection               | Dependencies provided externally  |
+| 5   | IoC                                | Spring controls object management |
+| 6   | @Autowired                         | Injects dependencies              |
+| 7   | Component vs Service vs Repository | General vs business vs database   |
+| 8   | @RestController                    | Creates REST APIs                 |
+| 9   | Controller vs RestController       | View vs response data             |
+| 10  | @RequestMapping                    | Maps HTTP requests                |
+| 11  | Get/Post/Put/Delete                | Read/Create/Update/Delete         |
+| 12  | Spring Data JPA                    | Simplifies database operations    |
+| 13  | Hibernate vs JPA                   | Implementation vs specification   |
+| 14  | @Entity                            | Maps class to database entity     |
+| 15  | @Id                                | Primary key                       |
+| 16  | @GeneratedValue                    | Generates primary key             |
+| 17  | @Transactional                     | Manages database transactions     |
+| 18  | application.properties             | Application configuration         |
+| 19  | REST API                           | Communication using HTTP          |
+| 20  | HTTP Status Codes                  | Request response status           |
+
+## Important practical concepts to prepare
+
+For a Java Developer interview, don't stop with definitions. Practise these scenarios too:
+
+1. How does Spring create and manage beans?
+2. What happens if two beans of the same type exist?
+3. Why is constructor injection preferred?
+4. What happens if `@Autowired` cannot find a matching bean?
+5. How does a request travel from Controller → Service → Repository → Database?
+6. What happens when an exception occurs inside a `@Transactional` method?
+7. Difference between `save()` and `saveAndFlush()`.
+8. Difference between `CrudRepository` and `JpaRepository`.
+
+My suggestion: Give special attention to Dependency Injection, IoC, REST APIs, Spring Data JPA, and `@Transactional`. These concepts are particularly important for practical Spring Boot interviews.
