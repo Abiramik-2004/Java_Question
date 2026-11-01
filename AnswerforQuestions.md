@@ -1175,3 +1175,672 @@ My suggested order for your Java interview preparation:
 10. Optional
 
 Interview tip: Don't just memorize the Stream API code. Understand what each method does. Interviewers often change the input or ask you to solve a similar problem with a different condition.
+
+# Java Interview Preparation – Multithreading & Exception Handling
+
+These are two very important Core Java interview topics. I'll explain each question in simple English, with examples and short interview answers that you can remember.
+
+# Part 1: Multithreading
+
+## 1. What is a Thread?
+
+A thread is a lightweight unit of execution within a process.
+
+- It is used to perform multiple tasks concurrently.
+- Multiple threads can run within the same process.
+- Threads share the process's memory and resources.
+
+Example:
+
+In a music application:
+
+- One thread plays music.
+- Another thread downloads songs.
+- Another thread handles user interactions.
+
+All these tasks can happen concurrently.
+
+Interview answer: A thread is the smallest unit of execution within a process that allows multiple tasks to run concurrently.
+
+## 2. Difference between Process and Thread?
+
+| Process                                  | Thread                                        |
+| ---------------------------------------- | --------------------------------------------- |
+| Independent program in execution         | Small unit of execution inside a process      |
+| Has its own memory space                 | Shares process memory                         |
+| More resource-intensive                  | Less resource-intensive                       |
+| Communication is comparatively expensive | Communication is easier through shared memory |
+| Failure is generally isolated            | A thread failure can affect the whole process |
+
+Example:
+
+- Process → Running Chrome browser.
+- Thread → One task running inside Chrome.
+
+Remember:
+
+- Process → Independent program.
+- Thread → Part of a process.
+
+## 3. How can you create a thread in Java?
+
+There are two common traditional ways to create and run a thread.
+
+Method 1: Extending Thread class
+
+```
+class MyThread extends Thread {
+
+    public void run() {
+        System.out.println("Thread is running");
+    }
+}
+
+class Main {
+    public static void main(String[] args) {
+
+        MyThread t = new MyThread();
+        t.start();
+    }
+}
+```
+
+Method 2: Implementing Runnable interface
+
+```
+class MyTask implements Runnable {
+
+    public void run() {
+        System.out.println("Thread is running");
+    }
+}
+
+class Main {
+    public static void main(String[] args) {
+
+        MyTask task = new MyTask();
+
+        Thread t = new Thread(task);
+        t.start();
+    }
+}
+```
+
+Important:
+
+- `start()` creates a new execution thread and invokes `run()` on that thread.
+- Calling `run()` directly does not create a new thread.
+
+## 4. Difference between Thread class and Runnable interface?
+
+| Thread                                       | Runnable                   |
+| -------------------------------------------- | -------------------------- |
+| It is a class                                | It is an interface         |
+| We extend Thread                             | We implement Runnable      |
+| Cannot extend another class at the same time | Can extend another class   |
+| Task and thread are tightly coupled          | Separates task from thread |
+| Less flexible                                | More flexible              |
+
+Remember: Runnable is generally preferred because Java supports only single class inheritance.
+
+## 5. What is Synchronization?
+
+Synchronization is a mechanism used to control access to shared resources by multiple threads.
+
+It prevents multiple threads from modifying shared data simultaneously in a way that causes data inconsistency.
+
+Example:
+
+```
+class Counter {
+
+    int count = 0;
+
+    synchronized void increment() {
+        count++;
+    }
+}
+```
+
+Here, `synchronized` allows only one thread at a time to execute this method on the same Counter object.
+
+Without synchronization: Multiple threads may update shared data incorrectly.
+
+With synchronization: Access to the synchronized method is controlled using the object's lock.
+
+Remember: Synchronization = Controls access to shared resources between threads.
+
+## 6. What is Deadlock?
+
+Deadlock is a situation where two or more threads wait forever for resources locked by each other.
+
+Example:
+
+- Thread 1 locks Resource A and waits for Resource B.
+- Thread 2 locks Resource B and waits for Resource A.
+- Both threads keep waiting.
+
+Deadlock example
+
+Thread 1
+
+Holds A
+
+Waits for B
+
+Thread 2
+
+Holds B
+
+Waits for A
+
+Both threads are stuck
+
+How to prevent deadlock?
+
+- Acquire locks in a consistent order.
+- Avoid unnecessary nested locks.
+- Use timeouts with lock operations where appropriate.
+
+Remember: Deadlock = Threads waiting for each other's locks forever.
+
+## 7. What is the volatile keyword?
+
+`volatile` is a keyword used in Java multithreading to ensure visibility of changes made by one thread to other threads.
+
+When one thread updates a volatile variable, other threads can see the updated value.
+
+Example:
+
+```
+class MyTask {
+
+    volatile boolean running = true;
+
+    void stop() {
+        running = false;
+    }
+}
+```
+
+Here, if one thread changes `running` to false, another thread reading it will see the updated value.
+
+Important:
+
+- Provides visibility.
+- Does not provide atomicity for compound operations.
+- Does not replace synchronization in every situation.
+
+Remember: Volatile = Visibility of shared variable changes.
+
+## 8. Difference between sleep() and wait()?
+
+| sleep()                                          | wait()                                            |
+| ------------------------------------------------ | ------------------------------------------------- |
+| Method of Thread class                           | Method of Object class                            |
+| Used to pause a thread                           | Used for inter-thread communication               |
+| Does not release the held locks                  | Releases the monitor lock on the object           |
+| Can be called without owning an object's monitor | Must be called while owning that object's monitor |
+| Wakes after the specified time or interruption   | Wakes after notification, interruption or timeout |
+
+Example:
+
+```
+Thread.sleep(1000);
+```
+
+Pauses the current thread for approximately one second.
+
+```
+synchronized (obj) {
+    obj.wait();
+}
+```
+
+Makes the current thread wait and releases that object's monitor lock.
+
+Remember:
+
+- sleep() → Pauses execution.
+- wait() → Waits for notification or another permitted wake-up condition and releases the object's monitor.
+
+## 9. Difference between notify() and notifyAll()?
+
+Both methods are used for inter-thread communication.
+
+| notify()                                 | notifyAll()                                                                   |
+| ---------------------------------------- | ----------------------------------------------------------------------------- |
+| Wakes one waiting thread                 | Wakes all threads waiting on that object's monitor                            |
+| JVM chooses which waiting thread to wake | All waiting threads become eligible to compete for the lock                   |
+| Other waiting threads remain waiting     | Other threads may proceed after acquiring the lock and checking the condition |
+
+Example:
+
+```
+synchronized (obj) {
+    obj.notify();
+}
+```
+
+```
+synchronized (obj) {
+    obj.notifyAll();
+}
+```
+
+Remember:
+
+- notify() → One waiting thread.
+- notifyAll() → All waiting threads.
+
+Both must be called while holding the object's monitor.
+
+## 10. What is ExecutorService?
+
+ExecutorService is a Java interface used to manage and execute multiple tasks using a thread pool.
+
+Instead of manually creating a new thread for every task, we can submit tasks to ExecutorService.
+
+Example:
+
+```
+import java.util.concurrent.*;
+
+class Main {
+    public static void main(String[] args) {
+
+        ExecutorService executor =
+            Executors.newFixedThreadPool(2);
+
+        executor.submit(() -> {
+            System.out.println("Task is running");
+        });
+
+        executor.shutdown();
+    }
+}
+```
+
+Advantages:
+
+- Reuses threads.
+- Reduces thread creation overhead.
+- Manages task execution.
+- Makes multithreading easier.
+
+Remember: ExecutorService = Manages a pool of threads and executes tasks.
+
+# Part 2: Exception Handling
+
+## 1. What is Exception Handling?
+
+Exception handling is a mechanism in Java used to handle runtime errors so that the program can continue or terminate gracefully.
+
+It prevents unexpected program termination when an error occurs.
+
+Example:
+
+```
+class Main {
+    public static void main(String[] args) {
+
+        try {
+            int a = 10 / 0;
+        }
+        catch (ArithmeticException e) {
+            System.out.println("Cannot divide by zero");
+        }
+    }
+}
+```
+
+Output:
+
+```
+Cannot divide by zero
+```
+
+Remember: Exception handling = Handling errors without abnormal program termination.
+
+## 2. Explain the Exception Hierarchy.
+
+In Java, `Throwable` is the parent class of both `Exception` and `Error`.
+
+Throwable
+
+Exception
+
+Checked
+
+IOException, SQLException
+
+Unchecked
+
+RuntimeException, ArithmeticException, NullPointerException
+
+Error
+
+Serious problems
+
+OutOfMemoryError, StackOverflowError
+
+Explanation:
+
+- Throwable → Parent class of exceptions and errors.
+- Exception → Problems applications may handle.
+- RuntimeException → Parent of unchecked exceptions.
+- Error → Serious JVM or system-level problems, generally not handled by application code.
+
+Remember: Throwable → Exception + Error.
+
+## 3. Difference between Checked and Unchecked Exceptions?
+
+| Checked Exception                                                      | Unchecked Exception                     |
+| ---------------------------------------------------------------------- | --------------------------------------- |
+| Checked at compile time                                                | Occurs at runtime                       |
+| Must be handled or declared                                            | Handling or declaring is not compulsory |
+| Subclasses of Exception, excluding RuntimeException and its subclasses | RuntimeException and its subclasses     |
+| Example: IOException                                                   | Example: NullPointerException           |
+
+Checked exception example:
+
+```
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) {
+
+        try {
+            FileReader f = new FileReader("test.txt");
+        }
+        catch (IOException e) {
+            System.out.println("File not found");
+        }
+    }
+}
+```
+
+Unchecked exception example:
+
+```
+class Main {
+    public static void main(String[] args) {
+
+        int a = 10 / 0;
+    }
+}
+```
+
+This produces `ArithmeticException`.
+
+Remember:
+
+- Checked → Compiler forces handling or declaration.
+- Unchecked → Compiler does not force handling.
+
+## 4. What is try-catch-finally?
+
+These are Java keywords used in exception handling.
+
+- `try` → Contains code that may throw an exception.
+- `catch` → Handles the exception.
+- `finally` → Contains cleanup code that normally executes whether an exception occurs or not.
+
+Example:
+
+```
+class Main {
+    public static void main(String[] args) {
+
+        try {
+            int a = 10 / 0;
+        }
+        catch (ArithmeticException e) {
+            System.out.println("Exception handled");
+        }
+        finally {
+            System.out.println("Finally executed");
+        }
+    }
+}
+```
+
+Output:
+
+```
+Exception handled
+Finally executed
+```
+
+Remember:
+
+- try → Risky code.
+- catch → Handle exception.
+- finally → Cleanup code.
+
+## 5. Can we have multiple catch blocks?
+
+Yes. We can use multiple catch blocks to handle different types of exceptions from a try block.
+
+Example:
+
+```
+class Main {
+    public static void main(String[] args) {
+
+        try {
+            int a = 10 / 0;
+        }
+        catch (ArithmeticException e) {
+            System.out.println("Arithmetic Exception");
+        }
+        catch (NullPointerException e) {
+            System.out.println("Null Pointer Exception");
+        }
+        catch (Exception e) {
+            System.out.println("General Exception");
+        }
+    }
+}
+```
+
+Output:
+
+```
+Arithmetic Exception
+```
+
+Important interview point:
+
+Always write specific exception catch blocks before general exception catch blocks.
+
+Otherwise, Java will show a compile-time error because the general catch block makes the specific one unreachable.
+
+## 6. Can finally execute without catch?
+
+Yes. A `finally` block can be used with a `try` block without a `catch` block.
+
+Example:
+
+```
+class Main {
+    public static void main(String[] args) {
+
+        try {
+            System.out.println("Try block");
+        }
+        finally {
+            System.out.println("Finally block");
+        }
+    }
+}
+```
+
+Output:
+
+```
+Try block
+Finally block
+```
+
+Remember: A try block must be followed by at least one catch block or a finally block.
+
+## 7. What is a Custom Exception?
+
+A Custom Exception is a user-defined exception created by the programmer to handle application-specific errors.
+
+We can create:
+
+- Checked custom exceptions by extending `Exception`.
+- Unchecked custom exceptions by extending `RuntimeException`.
+
+Example:
+
+```
+class InvalidAgeException extends Exception {
+
+    InvalidAgeException(String message) {
+        super(message);
+    }
+}
+
+class Main {
+    public static void main(String[] args) {
+
+        int age = 15;
+
+        try {
+            if (age < 18) {
+                throw new InvalidAgeException(
+                    "Age must be 18 or above"
+                );
+            }
+        }
+        catch (InvalidAgeException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
+```
+
+Output:
+
+```
+Age must be 18 or above
+```
+
+Remember: Custom Exception = Exception created by the programmer.
+
+## 8. What happens when an exception occurs inside a finally block?
+
+If an exception occurs inside a finally block, it can propagate to the caller and may replace an exception that was already being thrown from the try or catch block.
+
+Example:
+
+```
+class Main {
+    public static void main(String[] args) {
+
+        try {
+            int a = 10 / 0;
+        }
+        finally {
+            int b = 10 / 0;
+        }
+    }
+}
+```
+
+Here:
+
+- The try block throws an ArithmeticException.
+- The finally block also throws an ArithmeticException.
+- The exception from finally takes precedence over the original exception during propagation.
+
+Important: The original exception can be lost unless it is explicitly preserved or suppressed.
+
+Remember: An exception inside finally can override an exception from try or catch.
+
+# Quick Interview Revision
+
+## Multithreading
+
+| No. | Question            | Important point                       |
+| --- | ------------------- | ------------------------------------- |
+| 1   | Thread              | Unit of execution                     |
+| 2   | Process vs Thread   | Independent process vs execution unit |
+| 3   | Creating Thread     | Thread and Runnable                   |
+| 4   | Thread vs Runnable  | Class vs Interface                    |
+| 5   | Synchronization     | Controls shared resource access       |
+| 6   | Deadlock            | Threads wait for each other's locks   |
+| 7   | Volatile            | Visibility                            |
+| 8   | Sleep vs Wait       | Pause vs release monitor and wait     |
+| 9   | Notify vs NotifyAll | One vs all waiting threads            |
+| 10  | ExecutorService     | Thread pool management                |
+
+## Exception Handling
+
+| No. | Question                 | Important point                  |
+| --- | ------------------------ | -------------------------------- |
+| 1   | Exception Handling       | Handles runtime problems         |
+| 2   | Exception Hierarchy      | Throwable → Exception / Error    |
+| 3   | Checked vs Unchecked     | Compile-time checking vs runtime |
+| 4   | Try-Catch-Finally        | Handle and clean up              |
+| 5   | Multiple Catch           | Yes                              |
+| 6   | Finally without Catch    | Yes                              |
+| 7   | Custom Exception         | User-defined exception           |
+| 8   | Exception inside Finally | Can replace original exception   |
+
+## Test yourself – Interview Practice
+
+Try answering these five questions without looking at the notes.
+
+Java interview mini-test
+
+0/5 answered
+
+1\. Which method actually starts a new thread?
+
+run()
+
+start()
+
+execute()
+
+sleep()
+
+2\. Does volatile guarantee atomicity for count++?
+
+Yes
+
+No
+
+3\. Which method releases the object's monitor lock?
+
+sleep()
+
+wait()
+
+notify()
+
+run()
+
+4\. Which is an unchecked exception?
+
+IOException
+
+SQLException
+
+NullPointerException
+
+FileNotFoundException
+
+5\. Can we use try with finally without catch?
+
+Yes
+
+No
+
+Submit answers
+
+My suggestion: Give extra attention to synchronization, deadlock, volatile, `wait()` vs `sleep()`, checked vs unchecked exceptions, and custom exceptions. These concepts are frequently used in practical Java and Spring Boot interview scenarios.
