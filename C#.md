@@ -1,4 +1,4 @@
-# 🚀 React JS Interview Preparation — Complete 60-Minute Crash Course
+# 🚀 React C# Interview Preparation — Complete 60-Minute Crash Course
 
 ## ⏰ Your 60-Minute Study Plan
 
