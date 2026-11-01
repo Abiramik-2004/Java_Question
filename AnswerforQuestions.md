@@ -2572,3 +2572,537 @@ For a Java Developer interview, don't stop with definitions. Practise these scen
 8. Difference between `CrudRepository` and `JpaRepository`.
 
 My suggestion: Give special attention to Dependency Injection, IoC, REST APIs, Spring Data JPA, and `@Transactional`. These concepts are particularly important for practical Spring Boot interviews.
+
+# Spring Boot – 8 Important Scenario-Based Interview Questions
+
+These questions are very important for Java Developer and Spring Boot interviews. Interviewers often ask these to check whether you understand how Spring Boot works internally, not just annotations.
+
+I'll explain each in simple English with examples and interview-ready answers.
+
+## 1. How does Spring create and manage beans?
+
+A Bean is simply an object that is created and managed by the Spring IoC container.
+
+How it works:
+
+1. Spring starts the application.
+2. It scans classes for annotations such as `@Component`, `@Service`, and `@Repository`.
+3. It creates objects for the detected classes.
+4. It injects their dependencies.
+5. It manages their lifecycle.
+
+Example:
+
+```
+@Repository
+public class EmployeeRepository {
+}
+
+@Service
+public class EmployeeService {
+
+    private final EmployeeRepository repository;
+
+    public EmployeeService(EmployeeRepository repository) {
+        this.repository = repository;
+    }
+}
+```
+
+Here:
+
+- Spring creates the EmployeeRepository bean.
+- Spring creates the EmployeeService bean.
+- Spring injects EmployeeRepository into EmployeeService.
+
+Important: By default, Spring beans are singleton-scoped, meaning one shared bean instance per Spring IoC container.
+
+Other bean scopes include:
+
+- Singleton
+- Prototype
+- Request
+- Session
+
+Interview answer:
+
+Spring creates beans through component scanning or explicit configuration, injects their dependencies, and manages their lifecycle using the IoC container.
+
+## 2. What happens if two beans of the same type exist?
+
+If two beans of the same type are available for injection, Spring may not know which one to inject.
+
+It can throw:
+
+`NoUniqueBeanDefinitionException`
+
+Example:
+
+```
+@Component
+class Airtel implements Sim {
+}
+
+@Component
+class Jio implements Sim {
+}
+
+@Service
+class MobileService {
+
+    @Autowired
+    Sim sim;
+}
+```
+
+Here, Spring finds two implementations of Sim:
+
+- Airtel
+- Jio
+
+It cannot decide which one to inject.
+
+Solution 1: Use @Qualifier
+
+```
+@Service
+class MobileService {
+
+    private final Sim sim;
+
+    public MobileService(@Qualifier("jio") Sim sim) {
+        this.sim = sim;
+    }
+}
+```
+
+Here, Spring injects the Jio bean.
+
+Solution 2: Use @Primary
+
+```
+@Component
+@Primary
+class Jio implements Sim {
+}
+```
+
+Now Spring chooses Jio by default when no qualifier specifies another bean.
+
+Interview answer:
+
+If multiple beans of the same type exist, Spring may throw `NoUniqueBeanDefinitionException`. We can resolve this using `@Qualifier` or `@Primary`.
+
+Remember:
+
+- `@Primary` → Default preferred bean.
+- `@Qualifier` → Specifies the exact bean.
+
+## 3. Why is constructor injection preferred?
+
+Constructor injection is preferred because it makes dependencies mandatory and improves code quality.
+
+Example:
+
+```
+@Service
+class EmployeeService {
+
+    private final EmployeeRepository repository;
+
+    public EmployeeService(EmployeeRepository repository) {
+        this.repository = repository;
+    }
+}
+```
+
+Advantages:
+
+1. Makes dependencies mandatory.
+2. Supports immutable fields using `final`.
+3. Makes unit testing easier.
+4. Avoids partially initialized objects.
+5. Makes dependencies clearly visible.
+
+Comparison:
+
+| Constructor Injection       | Field Injection                                 |
+| --------------------------- | ----------------------------------------------- |
+| Uses constructor            | Uses `@Autowired` on field                      |
+| Supports `final` fields     | Cannot use `final` for ordinary field injection |
+| Easier to unit test         | Harder to test without Spring or reflection     |
+| Makes dependencies explicit | Dependencies are less visible                   |
+
+Interview answer:
+
+Constructor injection is preferred because it ensures required dependencies are provided during object creation, supports immutability, and makes unit testing easier.
+
+## 4. What happens if @Autowired cannot find a matching bean?
+
+If Spring cannot find a required bean for an `@Autowired` dependency, it normally throws an exception during application startup.
+
+The common exception is:
+
+`NoSuchBeanDefinitionException`
+
+Example:
+
+```
+@Service
+class EmployeeService {
+
+    @Autowired
+    EmployeeRepository repository;
+}
+```
+
+Suppose `EmployeeRepository` is not registered as a Spring bean.
+
+Spring cannot inject it, so application startup fails.
+
+How to solve it?
+
+1. Add the correct annotation, such as `@Repository`.
+2. Check whether the package is included in component scanning.
+3. Check whether the bean is created using `@Bean`.
+4. Check whether the required configuration is active.
+
+What if the dependency is optional?
+
+We can use `Optional`:
+
+```
+@Autowired
+public EmployeeService(
+    Optional<EmployeeRepository> repository) {
+
+    this.repository = repository;
+}
+```
+
+Spring can inject an empty Optional if no matching bean exists.
+
+Interview answer:
+
+If a required bean is missing, Spring generally throws `NoSuchBeanDefinitionException`, causing application startup to fail.
+
+## 5. How does a request travel from Controller → Service → Repository → Database?
+
+This is one of the most important Spring Boot interview questions.
+
+Let's understand it using an Employee Management application.
+
+## Spring Boot request flow
+
+Client / Frontend
+
+Sends HTTP request
+
+Controller
+
+Receives request and returns HTTP response
+
+Service
+
+Executes business logic
+
+Repository
+
+Performs database operations using JPA
+
+Database
+
+Stores or retrieves employee data
+
+Response travels back to the client
+
+Let's see the code.
+
+Step 1: Entity
+
+```
+@Entity
+public class Employee {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+}
+```
+
+Step 2: Repository
+
+```
+@Repository
+public interface EmployeeRepository
+        extends JpaRepository<Employee, Long> {
+}
+```
+
+Step 3: Service
+
+```
+@Service
+public class EmployeeService {
+
+    private final EmployeeRepository repository;
+
+    public EmployeeService(EmployeeRepository repository) {
+        this.repository = repository;
+    }
+
+    public Employee saveEmployee(Employee employee) {
+        return repository.save(employee);
+    }
+}
+```
+
+Step 4: Controller
+
+```
+@RestController
+@RequestMapping("/employees")
+public class EmployeeController {
+
+    private final EmployeeService service;
+
+    public EmployeeController(EmployeeService service) {
+        this.service = service;
+    }
+
+    @PostMapping
+    public Employee addEmployee(@RequestBody Employee employee) {
+        return service.saveEmployee(employee);
+    }
+}
+```
+
+Example request:
+
+```
+POST /employees
+Content-Type: application/json
+```
+
+```
+{
+    "name": "Abirami"
+}
+```
+
+What happens internally?
+
+1. Client sends a POST request.
+2. Spring MVC routes it to the Controller.
+3. Controller calls the Service.
+4. Service executes business logic.
+5. Service calls the Repository.
+6. Repository uses JPA/Hibernate to perform database operations.
+7. Database saves the employee.
+8. Response travels back to the client, usually as JSON.
+
+Interview answer:
+
+The Controller handles HTTP requests, the Service contains business logic, the Repository handles database operations, and the Database stores or retrieves data. The response then travels back to the client.
+
+## 6. What happens when an exception occurs inside a @Transactional method?
+
+`@Transactional` manages database transactions.
+
+If an unchecked exception occurs inside a transactional method, Spring normally rolls back the transaction.
+
+Example:
+
+```
+@Service
+public class EmployeeService {
+
+    private final EmployeeRepository repository;
+
+    public EmployeeService(EmployeeRepository repository) {
+        this.repository = repository;
+    }
+
+    @Transactional
+    public void saveEmployee() {
+
+        Employee e1 = new Employee();
+        e1.setName("Abirami");
+
+        repository.save(e1);
+
+        throw new RuntimeException("Something went wrong");
+    }
+}
+```
+
+What happens?
+
+1. Spring starts a transaction.
+2. Employee is saved within the transaction.
+3. RuntimeException occurs.
+4. Spring rolls back the transaction.
+5. The employee insert is not committed.
+
+Important interview point:
+
+| Exception            | Default rollback?                           |
+| -------------------- | ------------------------------------------- |
+| RuntimeException     | Yes                                         |
+| NullPointerException | Yes                                         |
+| ArithmeticException  | Yes                                         |
+| IOException          | No                                          |
+| SQLException         | No, if it propagates as a checked exception |
+
+To enable rollback for checked exceptions:
+
+```
+@Transactional(rollbackFor = Exception.class)
+```
+
+Important conditions:
+
+- The exception must propagate out of the transactional method for the default rollback rule to apply.
+- If you catch the exception and don't rethrow it or mark the transaction rollback-only, Spring may commit.
+- In Spring's default proxy-based transaction management, self-invocation (calling another `@Transactional` method within the same object) does not trigger a new transactional proxy interception.
+
+Interview answer:
+
+When an unchecked exception occurs inside a `@Transactional` method, Spring rolls back the transaction by default. For checked exceptions, we can configure rollback using `rollbackFor`.
+
+## 7. Difference between save() and saveAndFlush()?
+
+Both methods are provided by Spring Data JPA's `JpaRepository`.
+
+| save()                                                | saveAndFlush()                                                     |
+| ----------------------------------------------------- | ------------------------------------------------------------------ |
+| Saves or updates an entity in the persistence context | Saves or updates and flushes changes immediately                   |
+| SQL execution may happen later                        | Pending SQL changes are synchronized with the database immediately |
+| Does not force an immediate flush                     | Forces a flush                                                     |
+| Usually preferred for normal operations               | Useful when immediate synchronization is needed                    |
+
+Example:
+
+```
+repository.save(employee);
+```
+
+Saves the entity, but the SQL may execute later when the persistence context is flushed or the transaction commits.
+
+```
+repository.saveAndFlush(employee);
+```
+
+Saves the entity and immediately synchronizes pending persistence-context changes with the database.
+
+Important: Flush does not mean commit. If the transaction later rolls back, the changes can still be rolled back.
+
+Interview answer:
+
+`save()` saves an entity, while `saveAndFlush()` saves it and immediately flushes pending changes to the database without necessarily committing the transaction.
+
+## 8. Difference between CrudRepository and JpaRepository?
+
+Both are Spring Data interfaces used for database operations.
+
+| CrudRepository                              | JpaRepository                                |
+| ------------------------------------------- | -------------------------------------------- |
+| Provides basic CRUD operations              | Provides CRUD plus JPA-specific operations   |
+| Supports save, findById, findAll, delete    | Provides all basic CRUD operations plus more |
+| Does not provide JPA-specific flush methods | Provides flush(), saveAndFlush()             |
+| More general                                | Specific to JPA                              |
+
+Example using CrudRepository:
+
+```
+public interface EmployeeRepository
+        extends CrudRepository<Employee, Long> {
+}
+```
+
+Example using JpaRepository:
+
+```
+public interface EmployeeRepository
+        extends JpaRepository<Employee, Long> {
+}
+```
+
+Important methods of JpaRepository:
+
+| Method           | Purpose                     |
+| ---------------- | --------------------------- |
+| `save()`         | Save or update entity       |
+| `findById()`     | Find by primary key         |
+| `findAll()`      | Retrieve all records        |
+| `deleteById()`   | Delete by ID                |
+| `flush()`        | Synchronize pending changes |
+| `saveAndFlush()` | Save and flush immediately  |
+
+Remember:
+
+- CrudRepository → Basic CRUD.
+- JpaRepository → CRUD + JPA features.
+
+# Final Interview Revision
+
+| No. | Question                         | Key answer                                   |
+| --- | -------------------------------- | -------------------------------------------- |
+| 1   | How Spring manages beans?        | IoC container                                |
+| 2   | Two beans of same type?          | @Qualifier / @Primary                        |
+| 3   | Why constructor injection?       | Mandatory dependencies and testability       |
+| 4   | Missing @Autowired bean?         | NoSuchBeanDefinitionException                |
+| 5   | Request flow?                    | Controller → Service → Repository → DB       |
+| 6   | Exception in transaction?        | Rollback by default for unchecked exceptions |
+| 7   | save vs saveAndFlush?            | Save vs immediate flush                      |
+| 8   | CrudRepository vs JpaRepository? | Basic CRUD vs additional JPA operations      |
+
+## Test your Spring Boot knowledge
+
+Try these five interview questions without referring to the answers.
+
+Spring Boot mini interview
+
+0/5 answered
+
+1\. What happens if Spring finds two beans of the same type?
+
+NoUniqueBeanDefinitionException may occur
+
+Application always selects the first bean
+
+Spring deletes one bean
+
+2\. Which injection is generally preferred?
+
+Field injection
+
+Constructor injection
+
+Static injection
+
+3\. Which layer should contain business logic?
+
+Controller
+
+Service
+
+Repository
+
+4\. Does saveAndFlush() commit the transaction?
+
+Yes, always
+
+No, it only flushes changes
+
+5\. By default, does Spring roll back for RuntimeException?
+
+Yes
+
+No
+
+Submit answers
+
+One important suggestion: Since you're preparing for Java Developer interviews, practise writing a small Employee Management REST API using Spring Boot, MySQL, Spring Data JPA, and exception handling. It will help you connect all 20 Spring Boot questions with real project experience.
